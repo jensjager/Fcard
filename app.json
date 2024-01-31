@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Fcard",
-    "slug": "Fcard",
+    "slug": "fcard",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jjens.fcard"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +26,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "86afd7e6-2010-48f3-ba0d-22d9003af74c"
+      }
+    },
+    "owner": "jjens"
   }
 }
