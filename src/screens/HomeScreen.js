@@ -6,7 +6,6 @@ import Colors from '../styles/Colors';
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <FlashCard />
       <StatusBar style="auto" />
     </View>
   );
