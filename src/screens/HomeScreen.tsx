@@ -6,7 +6,7 @@ import Colors from '../styles/Colors';
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar />
     </View>
   );
 };

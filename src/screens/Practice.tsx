@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { StyleSheet, Text, View, StatusBar, Pressable } from 'react-native';
 import FlashCard from '../components/FlashCard';
 import Colors from '../styles/Colors';
@@ -40,9 +40,12 @@ const wordsData = [
 
 const Practice = () => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const rotateRef = useRef(null);
 
   const handleCorrectAnswer = () => {
-    // Move to the next card
+    if (rotateRef.current) {
+      rotateRef.current();
+    }
     setCurrentCardIndex((prevIndex) => (prevIndex + 1) % wordsData.length);
   };
 
@@ -53,13 +56,12 @@ const Practice = () => {
 
   return (
     <View style={styles.container}>
-      {/* Display FlashCard component */}
       <FlashCard
         word={wordsData[currentCardIndex].word}
         meaning={wordsData[currentCardIndex].meaning}
+        setRotate={(rotateFunction) => (rotateRef.current = rotateFunction)}
       />
 
-      {/* Buttons for user response */}
       <View style={styles.buttonsContainer}>
         <Pressable style={styles.button} onPress={handleCorrectAnswer}>
           <Text style={styles.buttonText}>Correct</Text>
@@ -69,7 +71,7 @@ const Practice = () => {
         </Pressable>
       </View>
 
-      <StatusBar style="auto" />
+      <StatusBar />
     </View>
   );
 };
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
-    color: Colors.white,
+    color: Colors.text,
     fontWeight: 'bold',
   },
 });
