@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { StyleSheet, Text, View, StatusBar, Pressable } from 'react-native';
 import FlashCard from '../components/FlashCard';
 import Colors from '../styles/Colors';
+import Animated, { useSharedValue, withTiming } from 'react-native-reanimated';
 
 const wordsData = [
   { word: '도시', meaning: 'city' },
@@ -36,11 +37,29 @@ const wordsData = [
   { word: '이다', meaning: 'to be' },
   { word: '네', meaning: 'yes' },
   { word: '아니', meaning: 'no' },
-];
+].slice(0, 10);
 
 const Practice = () => {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const rotateRef = useRef(null);
+  const activeIndex = useSharedValue(0);
+  const duration = 500;
+
+  const handleCorrectAnswer2 = () => {
+    if (activeIndex.value == wordsData.length) {
+      return;
+    }
+    activeIndex.value = withTiming(activeIndex.value + 1, { duration });
+    // activeIndex.value = activeIndex.value + 1;
+  };
+
+  const handleIncorrectAnswer2 = () => {
+    if (activeIndex.value === 0) {
+      return;
+    }
+    activeIndex.value = withTiming(activeIndex.value - 1, { duration });
+    // activeIndex.value = activeIndex.value - 1;
+  };
 
   const handleCorrectAnswer = () => {
     if (rotateRef.current) {
@@ -56,17 +75,26 @@ const Practice = () => {
 
   return (
     <View style={styles.container}>
-      <FlashCard
-        word={wordsData[currentCardIndex].word}
-        meaning={wordsData[currentCardIndex].meaning}
-        setRotate={(rotateFunction) => (rotateRef.current = rotateFunction)}
-      />
+      <Animated.View style={styles.flashcard}>
+        {wordsData.map((c, index) => {
+          return (
+            <FlashCard
+              key={index}
+              word={c.word}
+              meaning={c.meaning}
+              index={index}
+              activeIndex={activeIndex}
+              totalLength={wordsData.length - 1}
+            />
+          );
+        })}
+      </Animated.View>
 
       <View style={styles.buttonsContainer}>
-        <Pressable style={styles.button} onPress={handleCorrectAnswer}>
+        <Pressable style={styles.button} onPress={handleCorrectAnswer2}>
           <Text style={styles.buttonText}>Correct</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={handleIncorrectAnswer}>
+        <Pressable style={styles.button} onPress={handleIncorrectAnswer2}>
           <Text style={styles.buttonText}>Incorrect</Text>
         </Pressable>
       </View>
@@ -82,6 +110,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondary,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  flashcard: {
+    position: 'relative',
+    width: 300,
+    height: 200,
+    top: 0,
   },
   buttonsContainer: {
     flexDirection: 'row',

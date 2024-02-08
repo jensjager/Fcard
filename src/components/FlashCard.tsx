@@ -22,19 +22,21 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   SharedValue,
+  Extrapolate,
 } from 'react-native-reanimated';
 import Colors from '../styles/Colors';
 
-const FlashCard = ({ word, meaning, setRotate }) => {
+const FlashCard = ({ word, meaning, index, totalLength, activeIndex }) => {
   const rotate = useSharedValue(0);
-  const turn = useSharedValue(false);
+  const gap = 14;
+  const maxVisibleCards = 6;
 
-  useEffect(() => {
-    setRotate(() => {
-      if (rotate.value === 1) rotate.value = 0;
-      turn.value = true;
-    });
-  }, [rotate, setRotate]);
+  // useEffect(() => {
+  //   setRotate(() => {
+  //     if (rotate.value === 1) rotate.value = 0;
+  //     turn.value = true;
+  //   });
+  // }, [rotate, setRotate]);
 
   const Card = ({
     rotate,
@@ -77,48 +79,89 @@ const FlashCard = ({ word, meaning, setRotate }) => {
         ],
       };
     });
+  const stylez = useAnimatedStyle(() => {
+    return {
+      position: 'absolute',
+      zIndex: activeIndex.value <= index ? totalLength - index : totalLength,
+      opacity: Math.max(
+        0,
+        Math.min(1, maxVisibleCards - Math.abs(activeIndex.value - index))
+      ),
+      transform: [
+        {
+          translateY: interpolate(
+            activeIndex.value,
+            [index - 1, index, index + 1, index + 2],
+            [-gap, 0, 350, 350 - gap]
+          ),
+        },
+        {
+          scale: interpolate(
+            activeIndex.value,
+            [index - 1, index, index + 1, index + 2],
+            [0.96, 1, 1, 0.96]
+          ),
+        },
+        // {
+        //   translateX: interpolate(
+        //     activeIndex.value,
+        //     [index - 1, index, index + 1],
+        //     [0, 0, -300],
+        //     { extrapolateRight: Extrapolate.CLAMP }
+        //   ),
+        // },
+
+        // {
+        //   rotateZ: `${interpolate(
+        //     activeIndex.value,
+        //     [index - 1, index, index + 1],
+        //     [0, 0, 0],
+        //     { extrapolateRight: Extrapolate.CLAMP }
+        //   )}deg`,
+        // },
+      ],
+    };
+  });
   return (
-    <View style={styles.container}>
+    <Animated.View style={[styles.container, stylez]}>
       <Animated.View style={[styles.frontcard, frontAnimatedStyles()]}>
         <Card rotate={rotate} text={word} />
       </Animated.View>
       <Animated.View style={[styles.backCard, backAnimatedStyles()]}>
         <Card rotate={rotate} text={meaning} />
       </Animated.View>
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: '75%',
-    maxWidth: 500,
-    height: '30%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  flashcard: {
     width: '100%',
     height: '100%',
-    backgroundColor: Colors.background2,
-    borderRadius: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    color: 'red',
   },
   frontcard: {
     position: 'absolute',
     backfaceVisibility: 'hidden',
+    width: '100%',
+    height: '100%',
   },
   backCard: {
     backfaceVisibility: 'hidden',
+    width: '100%',
+    height: '100%',
   },
   card: {
     backgroundColor: Colors.background2,
-    width: 300,
-    height: 200,
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
     padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: Colors.text,
+    borderWidth: 1,
   },
   cardText: {
     color: '#1b1b1b',
